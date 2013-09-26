@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- Definimos la codificación de la página -->
+	<meta charset="utf-8" />
+	<!-- Con esta etiqueta indicamos que el usuario no puede hacer zoom, se pueden hacer más cosas con ella -->
+	<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+	<!-- El titulo de la página -->
+	<title>Google Maps :(</title>
+	<!-- Definimos la hoja de estilos -->
+	<link rel="stylesheet" href="css/gestilo.css" />
+</head>
+
+<body>
+
+	<!-- Es el contenedor que tiene nuesto mapa -->
+	<div id="mapa"></div>
+
+	<!-- Iniciamos la libreria necesaria para poder usar Google Maps, replacen TOKEN por el que les dio Google -->
+	<script src="https://maps.googleapis.com/maps/api/js?key=TOKEN&sensor=true"></script>
+	<script>
+		//Definimos dos variables donde guardaremos las coordenadas, pero ademas las voy a inicializar con valores ya establecidos
+		//justamente las inicio con las coordenadas de la FES...
+		//Estas variables son globales
+		var lat = 19.474576, lng = -99.044449;
+
+		//Le pregunto al navegador si tiene soporte para la geolocaclización
+		if ("geolocation" in navigator)
+			//Si tiene, llamamos al metodo: getCurrentPosition que recibe dos funciones como parametros
+			//eséste metodo devuelve varias cosas, consultar más aquí: http://www.w3schools.com/html/html5_geolocation.asp
+			//En este caso le pasamos dos funciones: correcto cuando si obtiene la ubicación e iniciar cuando tuvo algún error...
+			navigator.geolocation.getCurrentPosition(correcto, iniciar);
+		//En caso de que el navegador no soporte la geolocaclización...
+		else
+			//Solo mostramos una alerta informado de que no se tiene soporte....
+			alert("Tu navegador no soporta la geolocación");
+
+		//Esta funcion se llama cuando si pudimos obtener la úbicación
+		function correcto(posicion){
+			//Solo asignamos los valores de la latitud y longitud a nuestras variables
+			lat = posicion.coords.latitude;
+			lng = posicion.coords.longitude;
+
+			//Llamamos al metodo iniciar...
+			iniciar();
+		}
+
+		//El metodo iniciar se llama siempre ya que aquí se configura todo lo necesario para desplegar el mapa de Google
+		function iniciar() {
+
+			//Creamos un objeto opcionesMapa donde se configura varias opciones
+			var opcionesMapa = {
+				//Definimos el centro con un objeto LatLng de la API de Google
+				center: new google.maps.LatLng(lat, lng),
+				//Indicamos que queremos un zoom de 17
+				zoom: 17,
+				//Decimos que queremos un mapa de "estilo" ROADMAP (el clasico de Google)
+				mapTypeId: google.maps.MapTypeId.ROADMAP
+			};
+
+			//Solo creamos un objeto "Map" de la API de Google pasandole dos parametros
+			//el primero es el div donde queremos que se muestre, el segundo son sus opciones...
+			var mapa = new google.maps.Map(document.querySelector("#mapa"), opcionesMapa);
+		}
+	</script>
+</body>
+</html>

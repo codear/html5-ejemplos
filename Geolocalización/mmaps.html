@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- Titulo de la pagina -->
+	<title>Mapbox rulz!</title>
+
+	<!-- Definimos la codificación en UTF-8 -->
+	<meta charset="utf-8" />
+
+	<!-- Indicamos que el ancho de la página es el ancho del dispositivo y bloqueamos la posibilidad de zoom -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<!-- Cargamos la hoja de estilos que necesita nuestra libreria Leaflet -->
+	<link rel="stylesheet" href="css/leaflet.css" />
+
+	<!-- Cargamos nuestra hoja de estilos -->
+	<link rel="stylesheet" href="css/mestilo.css" />
+</head>
+
+<body>
+
+	<!-- Este será el contenedor de nuestro mapa -->
+	<div id="mapa"></div>
+
+	<!-- Llamamos a nuestra libreria de Leaflet que nos permite hacer uso del manejo de mapas... -->
+	<script src="js/leaflet.js"></script>
+	<!-- Nuestro programa principal -->
+	<script>
+
+		//Primero indicamos mediante el metodo "map" de "L" que busque en el HTML el elemento con el id mapa, en este caso nuestro div
+		var mapa = L.map('mapa');
+
+		//Leaflet necesita alguien que le provea los tiles(las imagenes), aquí definimos con el metodo "tileLayer"
+		//Le pasamos como primer parametro la URL de la API de MapBox (NOTA: TOKEN debe ser reemplazado por el suyo)
+		//Como segundo parametro es un objeto que tiene algunas opciones del mapa...
+		L.tileLayer('http://a.tiles.mapbox.com/v3/TOKEN/{z}/{x}/{y}.png', {
+			maxZoom: 18,
+			attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery Â© <a href="http://mapbox.com">Mapbox</a>'}).addTo(mapa);
+		//En esa última parte lo añadimos a nuestro objeto mapa
+
+		//Necesitamos indicarle a Leaftlet en que coordenanas inicialziar el mapa, en este caso son las de la FES...
+		mapa.setView([19.474576, -99.044449], 16);
+
+		//Le preguntamos al navegador si tiene la capacidad de geolocalización...
+		if (navigator.geolocation)
+			//Llamamos al metodo "getCurrentPosition" y allí mismo vamos definiendo las funciones...
+			navigator.geolocation.getCurrentPosition(function(posicion){
+				//Aquí simplemente creo un nuevo objeto con la latitud y la longitud que hemos recibido del navegador
+				coordenadas = new L.LatLng(posicion.coords.latitude, posicion.coords.longitude);
+
+				//Aquí definimos una variable que nos indica con cuanta aproximación nos esta ubicando...
+				radio = posicion.coords.accuracy / 2;
+
+				//Con esta linea estamos creando un "pin" o "marcador" en el mapa pasandole las coordenadas que obtuvimos del navegador...
+				//De igual manera lo tenemos que añadir a nuestro mapa: "addTo(mapa)"
+				L.marker(coordenadas).addTo(mapa).bindPopup("Estas aprox. a  " + radio + " metros de este punto").openPopup();
+
+				//Con el meotdo circle dibujamos un circulo en las coordenadas con un radio que es igual a los metros con los que aproximadamente nos indica que estamos en ese punto dividido entre dos (para que no sea muy grande)
+				L.circle(coordenadas, radio).addTo(mapa);
+
+				//Movemos el mapa a estas nuevas coordenadas
+				mapa.setView(coordenadas, 16);
+			}, 
+			//En caso de un error al obtener la ubicación....
+			function(e){
+				//Solo mostramos una alaerta...
+				alert(e.messager);
+			});
+		//En caso de que el navegador no soporte la geolocalización...
+		else
+			//Mandamos una alerta.
+			alert("Tu navegador no soporta geolocalización");
+
+	</script>
+</body>
+</html>
