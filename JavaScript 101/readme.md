@@ -1,4 +1,4 @@
-Geolocalización
+JavaScript 101
 ==============
 
 <img src="http://codear.la/codear-header.jpg" alt="codear" />
